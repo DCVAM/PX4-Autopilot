@@ -1,27 +1,99 @@
-# PX4 Drone Autopilot
+# Drone Control System for Industrial Inspections
 
-[![Releases](https://img.shields.io/github/release/PX4/PX4-Autopilot.svg)](https://github.com/PX4/PX4-Autopilot/releases) [![DOI](https://zenodo.org/badge/22634/PX4/PX4-Autopilot.svg)](https://zenodo.org/badge/latestdoi/22634/PX4/PX4-Autopilot)
+This repository contains a simulation environment for developing and testing autonomous drone control systems tailored for industrial inspection tasks using PX4 Autopilot.
 
-[![Build Targets](https://github.com/PX4/PX4-Autopilot/actions/workflows/build_all_targets.yml/badge.svg?branch=main)](https://github.com/PX4/PX4-Autopilot/actions/workflows/build_all_targets.yml) [![SITL Tests](https://github.com/PX4/PX4-Autopilot/workflows/SITL%20Tests/badge.svg?branch=master)](https://github.com/PX4/PX4-Autopilot/actions?query=workflow%3A%22SITL+Tests%22)
+## Key Features
+- PX4 SITL (Software-In-The-Loop) simulation with Gazebo
+- Pre-configured F450 drone model with brushless motors
+- Ready-to-use setup for industrial inspection scenarios
+- Integration with QGroundControl for mission planning
 
-[![Discord Shield](https://discordapp.com/api/guilds/1022170275984457759/widget.png?style=shield)](https://discord.gg/dronecode)
+## Prerequisites
+- Ubuntu 20.04/22.04 LTS (Recommended)
+- Git
+- Gazebo 11+
+- PX4 development toolchain
+- QGroundControl (for mission control)
 
-This repository holds the [PX4](http://px4.io) flight control solution for drones, with the main applications located in the [src/modules](https://github.com/PX4/PX4-Autopilot/tree/main/src/modules) directory. It also contains the PX4 Drone Middleware Platform, which provides drivers and middleware to run drones.
+## Quick Start Guide
 
-PX4 is highly portable, OS-independent and supports Linux, NuttX and MacOS out of the box.
+### 1. Setup Workspace
+```bash
+# Create project directory
+mkdir -p ~/drone_ws/src
+cd ~/drone_ws/src
 
-* Official Website: http://px4.io (License: BSD 3-clause, [LICENSE](https://github.com/PX4/PX4-Autopilot/blob/main/LICENSE))
-* [Supported airframes](https://docs.px4.io/main/en/airframes/airframe_reference.html) ([portfolio](https://px4.io/ecosystem/commercial-systems/)):
-  * [Multicopters](https://docs.px4.io/main/en/frames_multicopter/)
-  * [Autogyro](https://docs.px4.io/main/en/frames_autogyro/)
-* Releases: [Downloads](https://github.com/PX4/PX4-Autopilot/releases)
+# Clone repository with submodules
+git clone https://github.com/DCVAM/PX4-Autopilot.git --recursive
+cd PX4-Autopilot
+```
 
+### 2. Build Simulation Environment
+```bash
+# Compile SITL with F450 airframe configuration
+make px4_sitl gz_f450_brush
+```
+This command:
+- Builds PX4 firmware for simulation
+- Launches Gazebo with the F450 airframe
+- Automatically starts QGroundControl (if installed)
+- Initializes MAVLink connections
 
-## Building a PX4 based drone, rover, boat or robot
+### 3. Basic Operations
+1. Arm the drone using QGroundControl
+2. Take off manually or via mission plan
+3. Use the following controls in terminal:
+   - `commander takeoff` - Autonomous takeoff
+   - `commander land` - Initiate landing
+   - `commander arm`/`disarm` - Arm/Disarm motors
 
-The [PX4 User Guide](https://docs.px4.io/main/en/) explains how to assemble [supported vehicles](https://docs.px4.io/main/en/airframes/airframe_reference.html) and fly drones with PX4.
-See the [forum and chat](https://docs.px4.io/main/en/#getting-help) if you need help!
+## Advanced Configuration
+### Custom Missions
+1. Create inspection routes in QGroundControl
+2. Add waypoints with sensor trigger actions
+3. Configure camera/gimbal parameters in:
+   ```bash
+   ~/drone_ws/src/PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix/airframes/4001_f450_brush
+   ```
 
+### Sensor Integration
+Add custom sensors to `gz_f450_brush.sdf`:
+```xml
+<sensor name="inspection_camera" type="camera">
+  <update_rate>30</update_rate>
+  <camera>
+    <horizontal_fov>1.047</horizontal_fov>
+    <image>
+      <width>1920</width>
+      <height>1080</height>
+    </image>
+  </camera>
+</sensor>
+```
+
+## Directory Structure
+```
+PX4-Autopilot/
+├── build/          # Compiled binaries
+├── launch/         # Simulation launch files
+├── models/         # Custom drone models
+├── src/            # Firmware source code
+└── tools/          # Development utilities
+```
+
+## Troubleshooting
+- **Build Errors**: Ensure all submodules are initialized (`git submodule update --init --recursive`)
+- **Gazebo Crashes**: Verify GPU drivers and Gazebo version compatibility
+- **Connection Issues**: Check MAVLink ports in QGroundControl settings
+
+## Contributing
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/inspection-path-planning`)
+3. Commit changes (`git commit -m "Add thermal camera simulation"`)
+4. Push to branch (`git push origin feature/inspection-path-planning`)
+5. Submit pull request
+
+For detailed documentation, visit [Project Wiki](https://github.com/DCVAM/PX4-Autopilot/wiki)
 
 ## Changing code and contributing
 
@@ -30,12 +102,6 @@ This [Developer Guide](https://docs.px4.io/main/en/development/development.html)
 Developers should read the [Guide for Contributions](https://docs.px4.io/main/en/contribute/).
 See the [forum and chat](https://docs.px4.io/main/en/#getting-help) if you need help!
 
-## Project Roadmap
-
-**Note: Outdated**
-
-A high level project roadmap is available [here](https://github.com/orgs/PX4/projects/25).
-
 ## Project Governance
 
 The PX4 Autopilot project including all of its trademarks is hosted under [Dronecode](https://www.dronecode.org/), part of the Linux Foundation.
@@ -43,3 +109,8 @@ The PX4 Autopilot project including all of its trademarks is hosted under [Drone
 <a href="https://www.dronecode.org/" style="padding:20px" ><img src="https://mavlink.io/assets/site/logo_dronecode.png" alt="Dronecode Logo" width="110px"/></a>
 <a href="https://www.linuxfoundation.org/projects" style="padding:20px;"><img src="https://mavlink.io/assets/site/logo_linux_foundation.png" alt="Linux Foundation Logo" width="80px" /></a>
 <div style="padding:10px">&nbsp;</div>
+
+
+## License
+This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](LICENSE.md) file for details
+
