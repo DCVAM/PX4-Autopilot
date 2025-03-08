@@ -55,6 +55,47 @@ This command:
    ```bash
    ~/drone_ws/src/PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix/airframes/4001_f450_brush
    ```
+## Advanced Setup Using Custom TMUX
+
+### 1. Install Dependencies
+#### Create separate directory for components
+   ```bash
+   mkdir -p ~/your_workspace/external_packages
+   cd ~/your_workspace/external_packages
+   ```
+
+#### Install required packages 
+These are just the config.yaml and tmux_sesh.sh files
+
+#### Install yq via snap
+   ```bash
+   sudo snap install yq
+   ```
+
+#### Update configuration paths
+   ```bash
+   nano ~/your_workspace/config.yaml
+   ```
+
+In this you need to modify the all the paths to your actual paths
+
+#### Make tmux script executable
+   ```bash
+   chmod +x ~/your_workspace/tmux_sesh.sh
+   ```
+
+#### Launch the tmux session
+   ```bash
+   ./tmux_sesh.sh
+   ```
+
+#### Cleanup Procedure 
+After testing, exit properly: 
+
+    Ctrl+b then press 2 (switch to pane 2)
+    Ctrl+c to stop processes
+    Terminate tmux session:
+      tmux kill-server
 
 ### Sensor Integration
 Add custom sensors to `gz_f450_brush.sdf`:
