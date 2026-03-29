@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  px4-sitl-dev:
+    build:
+      context: .
+      args:
+        UID: ${UID}
+        GID: ${GID}
+        PX4_SRC: ${PX4_SRC}
+    image: px4-sitl-dev:latest
+    container_name: px4-sitl-dev
+    user: "${UID}:${GID}"
+    devices:
+      - /dev/dri:/dev/dri  # GPU acceleration for Gazebo
+    environment:
+      - DISPLAY=${DISPLAY}
+      - ROS_DISTRO=${ROS_DISTRO}
+      - TERM=xterm-256color
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix # X11 socket for GUI applications
+      - ${PX4_SRC}:/src/PX4-Autopilot  # PX4 source code
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
